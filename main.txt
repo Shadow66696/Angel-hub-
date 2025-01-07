@@ -1,3 +1,4 @@
+-- [SCRIPT COMPLETO UNIDO E CORRIGIDO]
 local player = game.Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = player.PlayerGui
@@ -49,26 +50,26 @@ mainButton.MouseButton1Click:Connect(function()
     libraryFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
     libraryFrame.Parent = screenGui
 
-    -- Tornar a biblioteca movível
+    -- Tornar a biblioteca móvel
     local draggingLibrary = false
-    local libraryDragStart, libraryStartPos
+    local dragStartLibrary, startPosLibrary
 
     libraryFrame.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             draggingLibrary = true
-            libraryDragStart = input.Position
-            libraryStartPos = libraryFrame.Position
+            dragStartLibrary = input.Position
+            startPosLibrary = libraryFrame.Position
         end
     end)
 
     libraryFrame.InputChanged:Connect(function(input)
         if draggingLibrary and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            local delta = input.Position - libraryDragStart
+            local delta = input.Position - dragStartLibrary
             libraryFrame.Position = UDim2.new(
-                libraryStartPos.X.Scale,
-                libraryStartPos.X.Offset + delta.X,
-                libraryStartPos.Y.Scale,
-                libraryStartPos.Y.Offset + delta.Y
+                startPosLibrary.X.Scale,
+                startPosLibrary.X.Offset + delta.X,
+                startPosLibrary.Y.Scale,
+                startPosLibrary.Y.Offset + delta.Y
             )
         end
     end)
@@ -88,7 +89,7 @@ mainButton.MouseButton1Click:Connect(function()
     title.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
     title.Parent = libraryFrame
 
-    -- Botão de fechar
+    -- Botão de ocultar
     local closeButton = Instance.new("TextButton")
     closeButton.Size = UDim2.new(0, 30, 0, 30)
     closeButton.Position = UDim2.new(1, -35, 0, 10)
@@ -99,7 +100,7 @@ mainButton.MouseButton1Click:Connect(function()
     closeButton.Parent = libraryFrame
 
     closeButton.MouseButton1Click:Connect(function()
-        libraryFrame:Destroy()
+        libraryFrame.Visible = false
     end)
 
     -- Criar a lista de scripts antigos
@@ -125,7 +126,7 @@ mainButton.MouseButton1Click:Connect(function()
         {"Infinite Yield", 'https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'},
         {"Rael Hub", "https://raw.githubusercontent.com/Laelmano24/Rael-Hub/main/main.txt"},
         {"Ghost Hub", "https://raw.githubusercontent.com/GhostPlayer352/Test4/main/GhostHub"},
-        {"Touch Speed", nil},
+        {"Touch Speed", nil}, -- Adicionado comportamento de toque duplo
         {"Fê Emotes", "https://scriptblox.com/raw/Brookhaven-RP-all-emotes-6849"},
     }
 
@@ -133,8 +134,8 @@ mainButton.MouseButton1Click:Connect(function()
     local scriptsNovos = {
         {"AstroX Hub", "https://raw.githubusercontent.com/AstroXTeam/AstroXHubNeta/refs/heads/main/%D9%87%D9%84%D9%88.lua"},
         {"Nameless Admin", "https://raw.githubusercontent.com/FilteringEnabled/NamelessAdmin/main/Source"},
-        {"Buraco Negro", nil}, -- Código customizado
         {"Sander X", "https://raw.githubusercontent.com/kigredns/SanderXV4.2.2/refs/heads/main/New.lua"},
+        {"Toque de Blocos", nil}
     }
 
     -- Função para criar botões
@@ -149,19 +150,20 @@ mainButton.MouseButton1Click:Connect(function()
             button.Parent = scriptList
 
             button.MouseButton1Click:Connect(function()
-                if script[1] == "Buraco Negro" then
-                    local message = Instance.new("TextLabel")
-                    message.Size = UDim2.new(0, 400, 0, 50)
-                    message.Position = UDim2.new(0.5, -200, 0.5, -25)
-                    message.Text = "O Buraco Negro só funciona em alguns mapas. Não é culpa do criador!"
-                    message.TextSize = 16
-                    message.TextColor3 = Color3.fromRGB(255, 255, 255)
-                    message.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-                    message.Parent = screenGui
+                if script[1] == "Touch Speed" then
+                    -- Código de "Touch Speed"
+                    local lastTouchTime = 0
+                    local speed = 300
 
-                    game:GetService("Debris"):AddItem(message, 3)
-
-                    -- Adicione aqui o código do script "Buraco Negro"
+                    game:GetService("UserInputService").InputBegan:Connect(function(input, processed)
+                        if not processed and input.UserInputType == Enum.UserInputType.Touch then
+                            local currentTime = tick()
+                            if currentTime - lastTouchTime < 0.5 then
+                                player.Character.Humanoid.WalkSpeed = speed
+                            end
+                            lastTouchTime = currentTime
+                        end
+                    end)
                 elseif script[2] then
                     loadstring(game:HttpGet(script[2]))()
                 else
