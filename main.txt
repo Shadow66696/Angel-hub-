@@ -1,13 +1,5 @@
 local player = game.Players.LocalPlayer
-
--- Verifica se o PlayerGui existe
-if not player:FindFirstChild("PlayerGui") then
-    warn("PlayerGui não encontrado!")
-    return
-end
-
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "AngelHubGui"
 screenGui.Parent = player.PlayerGui
 
 -- Criando o botão principal movível
@@ -32,7 +24,7 @@ mainButton.InputBegan:Connect(function(input)
 end)
 
 mainButton.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
         local delta = input.Position - dragStart
         mainButton.Position = UDim2.new(
             startPos.X.Scale,
@@ -49,7 +41,24 @@ mainButton.InputEnded:Connect(function(input)
     end
 end)
 
--- Código principal para abrir a biblioteca de scripts
+-- Função para exibir uma mensagem temporária
+local function showMessage(text, duration)
+    local message = Instance.new("TextLabel")
+    message.Size = UDim2.new(0.3, 0, 0.05, 0)
+    message.Position = UDim2.new(0.35, 0, 0.45, 0)
+    message.Text = text
+    message.TextSize = 18
+    message.TextColor3 = Color3.fromRGB(255, 255, 255)
+    message.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    message.BackgroundTransparency = 0.5
+    message.Parent = screenGui
+    
+    task.delay(duration, function()
+        message:Destroy()
+    end)
+end
+
+-- Criando a biblioteca de scripts
 mainButton.MouseButton1Click:Connect(function()
     local libraryFrame = Instance.new("Frame")
     libraryFrame.Size = UDim2.new(0, 700, 0, 500)
@@ -110,7 +119,7 @@ mainButton.MouseButton1Click:Connect(function()
         libraryFrame.Visible = false
     end)
 
-    -- Criação da lista de scripts
+    -- Criar a lista de scripts antigos
     local scriptList1 = Instance.new("ScrollingFrame")
     scriptList1.Size = UDim2.new(0.5, -15, 1, -60)
     scriptList1.Position = UDim2.new(0, 10, 0, 50)
@@ -119,10 +128,11 @@ mainButton.MouseButton1Click:Connect(function()
     scriptList1.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
     scriptList1.Parent = libraryFrame
 
+    -- Criar a lista de scripts novos
     local scriptList2 = Instance.new("ScrollingFrame")
     scriptList2.Size = UDim2.new(0.5, -15, 1, -60)
     scriptList2.Position = UDim2.new(0.5, 5, 0, 50)
-    scriptList2.CanvasSize = UDim2.new(0, 0, 0, 800)
+    scriptList2.CanvasSize = UDim2.new(0, 0, 0, 1000)
     scriptList2.ScrollBarThickness = 12
     scriptList2.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
     scriptList2.Parent = libraryFrame
@@ -132,7 +142,7 @@ mainButton.MouseButton1Click:Connect(function()
         {"Infinite Yield", 'https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'},
         {"Rael Hub", "https://raw.githubusercontent.com/Laelmano24/Rael-Hub/main/main.txt"},
         {"Ghost Hub", "https://raw.githubusercontent.com/GhostPlayer352/Test4/main/GhostHub"},
-        {"Touch Speed", nil},
+        {"Touch Speed", nil}, -- Adicionado comportamento de toque duplo
         {"Fê Emotes", "https://scriptblox.com/raw/Brookhaven-RP-all-emotes-6849"},
     }
 
@@ -142,6 +152,9 @@ mainButton.MouseButton1Click:Connect(function()
         {"Nameless Admin", "https://raw.githubusercontent.com/FilteringEnabled/NamelessAdmin/main/Source"},
         {"Sander X", "https://raw.githubusercontent.com/kigredns/SanderXV4.2.2/refs/heads/main/New.lua"},
         {"Toque de Blocos", nil},
+        {"ORION-BL", 'https://raw.githubusercontent.com/igormsqq/ORION-BL/main/KEYSYS'},
+        {"Shox Script", 'https://raw.githubusercontent.com/Leozinxz/Shox-Script-Hub/refs/heads/main/devzak'},
+        {"Y-HUB", 'https://raw.githubusercontent.com/Luarmor123/community-Y-HUB/refs/heads/main/YHUB%20ENGLISH'}
     }
 
     -- Função para criar botões
@@ -156,7 +169,17 @@ mainButton.MouseButton1Click:Connect(function()
             button.Parent = scriptList
 
             button.MouseButton1Click:Connect(function()
-                if script[1] == "Touch Speed" then
+                if script[1] == "Y-HUB" then
+                    showMessage("A Key do Hub é YFDQMASrE", 4)
+                    task.delay(4, function()
+                        loadstring(game:HttpGet(script[2]))()
+                    end)
+                elseif script[1] == "ORION-BL" then
+                    showMessage("A KEY DO HUB É IGOR_1", 4)
+                    task.delay(4, function()
+                        loadstring(game:HttpGet(script[2]))()
+                    end)
+                elseif script[1] == "Touch Speed" then
                     -- Código de "Touch Speed"
                     local lastTouchTime = 0
                     local speed = 300
@@ -171,25 +194,28 @@ mainButton.MouseButton1Click:Connect(function()
                         end
                     end)
                 elseif script[1] == "Toque de Blocos" then
-                    -- Código para criar blocos ao tocar na tela
-                    local UserInputService = game:GetService("UserInputService")
-                    local workspace = game.Workspace
-                    local character = player.Character or player.CharacterAdded:Wait()
-                    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-
-                    UserInputService.InputBegan:Connect(function(input, processed)
+                    -- Código de "Toque de Blocos"
+                    game:GetService("UserInputService").InputBegan:Connect(function(input, processed)
                         if not processed and input.UserInputType == Enum.UserInputType.Touch then
+                            local character = player.Character or player.CharacterAdded:Wait()
+                            local rootPart = character:WaitForChild("HumanoidRootPart")
+
+                            -- Criando bloco
                             local block = Instance.new("Part")
-                            block.Size = Vector3.new(4, 1, 4)
+                            block.Size = Vector3.new(5, 1, 5)
                             block.Anchored = true
-                            block.Position = humanoidRootPart.Position - Vector3.new(0, humanoidRootPart.Size.Y / 2 + 0.5, 0)
+                            block.Position = rootPart.Position - Vector3.new(0, 3, 0)
+                            block.BrickColor = BrickColor.Random()
                             block.Parent = workspace
+
+                            -- Remove bloco após 10 segundos
+                            game:GetService("Debris"):AddItem(block, 10)
                         end
                     end)
                 elseif script[2] then
                     loadstring(game:HttpGet(script[2]))()
                 else
-                    warn("O script selecionado não possui funcionalidade.")
+                    print(script[1] .. " não possui URL de script.")
                 end
             end)
         end
